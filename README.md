@@ -1,10 +1,18 @@
 # LT2316 H20 Assignment A1
 
-Name: *fill in your real name here* (if you don't want to use your real name with your current GitHub account, you will have to make another GitHub account)
+Name: Kate Viloria  
 
 ## Notes on Part 1.
 
-*fill in notes and documentation for part 1 as mentioned in the assignment description*
+__Helper Functions__  
+_Get all paths for each xml file._  
+```bash
+get_subdir(path_to_folder)
+get_xmls(path)
+```  
+
+
+
 
 ## Notes on Part 2.
 
