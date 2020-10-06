@@ -32,13 +32,13 @@ For this distribution, I decided a bar graph makes more sense to display this in
 
  
 ## Notes on Part 2.
-#### Extract Features  
-_Extra Arguments_  
-- id2word - token id to word dictionary for creating the word embeddings and for accessing the string representations of each token id for pos-tagging  
+### Extract Features  
+**_Extra Arguments_**   
+- **id2word** : manually creating a dictionary by checking if the word is already in the dictionary, if not make a new token using a counter - token id to word dictionary for creating the word embeddings and for accessing the string representations of each token id for pos-tagging  
 _Features_  
-- POS-tagging : uses NLTK POS-tagger to iterate through each sentence and give each word a lexical category. I thought this would be useful since entities are usually nouns or adjectives. Entities are also typically surrounded by words of the same lexical category especially since the corpus is based on talking about the effects of the drugs or the interactions between drugs. Sentences in the corpus have similar formulations since they are quite terse or concise. 
-- .istitle() : checks whether or not each string token is capitalised (1 for true, 0 for false) - From exploring the corpus, a lot of the entities are capitalised. Close to all of the entities under the entity group brand are capitalised and capitalised entities are quite common in the 3 other entity groups. I also noticed that there were sentences that would begin with the entity--meaning that they would also be capitalised. I figured this would be a simple but useful feature to add onto the model. 
-- Word Embeddings : created tensors through PyTorch that represented the words in the vocabulary - Word embeddings would be useful in addition to POS-tagging. They capture the semantic meaning of a word through the foundations of distributional hypothesis. Creating a model that maps a certain word to a vector in a 'space' based on the words around them would be very useful for NER since entities appear in very similar contexts.  
+- **POS-tagging** : uses NLTK POS-tagger to iterate through each sentence and give each word a lexical category. I thought this would be useful since entities are usually nouns or adjectives. Entities are also typically surrounded by words of the same lexical category especially since the corpus is based on talking about the effects of the drugs or the interactions between drugs. Sentences in the corpus have similar formulations since they are quite terse or concise. 
+- **.istitle()** : checks whether or not each string token is capitalised (1 for true, 0 for false) - From exploring the corpus, a lot of the entities are capitalised. Close to all of the entities under the entity group brand are capitalised and capitalised entities are quite common in the 3 other entity groups. I also noticed that there were sentences that would begin with the entity--meaning that they would also be capitalised. I figured this would be a simple but useful feature to add onto the model. 
+- **Word Embeddings** : created tensors through PyTorch that represented the words in the vocabulary - Word embeddings would be useful in addition to POS-tagging. They capture the semantic meaning of a word through the foundations of distributional hypothesis. Creating a model that maps a certain word to a vector in a 'space' based on the words around them would be very useful for NER since entities appear in very similar contexts.  
 
 ## Notes on Part Bonus.  
 #### Extended Data Exploration  
