@@ -6,17 +6,17 @@ Name: Kate Viloria
 #### Load Dataset and Explore  
 
 __Helper Functions__  
-_Get all paths for each xml file._  
+**_Get all paths for each xml file_**  
 ```bash
 get_subdir(path_to_folder)
 get_xmls(path)  
 
 ```  
-_Extra DDI Data in Test Folder._  
+**_Extra DDI Data in Test Folder_**    
 (inside _parse_data)  
 After reading some articles online and looking at the current ratio (70/30 train test split) of the data, I decided to go for a 70% train, 15% validation/development, and 15% test split. I split them through the documents instead of the tokens to keep the context of the tokens and entities in tact. I decided to add the documents for the DDI Extraction task in the training data. Then I randomly sampled ~around (used floor division) the same amount of documents that were in the NER test folder and took them from the training set to create the validation set. 
 
-_Create dataframes._
+**_Create dataframes_**  
 ```bash
 open_xmls(file_list)
 process_text(str)
