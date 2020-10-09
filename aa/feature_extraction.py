@@ -7,6 +7,7 @@ import nltk
 nltk.download('averaged_perceptron_tagger')
 import torch
 import torch.nn as nn
+from nltk.corpus import stopwords
 
 # Feel free to add any new code to this script
 
@@ -41,7 +42,8 @@ def is_upper(sent):
     upper_tensor = torch.FloatTensor(upper)
     return upper_tensor
 
-def get_features(split_df, id2word, max_sample_length, pos_dict, embeds):
+
+def get_features(split_df, id2word, max_sample_length, pos_dict):
     """
     Takes a split dataframe and returns a tensor of tensor of tensors. (split, sentence, word)
     """    
@@ -52,11 +54,14 @@ def get_features(split_df, id2word, max_sample_length, pos_dict, embeds):
     char_end = split_df['char_end_id'].tolist()
     
     split_features = []
+
+    stop_words = stopwords.words('english')
     
     for every_sentence in sentences:
 
         sent_words = [] # list of strings, each element is token in the sentence
-        sent_embeddings = []
+        word_lengths = []
+        stop_or_not = []  
         
         # create smaller df with just sentence being examined
         sent_df = split_df.loc[split_df['sentence_id'] == every_sentence]
@@ -67,12 +72,24 @@ def get_features(split_df, id2word, max_sample_length, pos_dict, embeds):
             word = id2word[every_token]
             sent_words.append(word)
             
-            # make embeddings
-            word_tensor = torch.tensor([every_token])
-            features = embeds(word_tensor) # get tensor from word embeddings
-            word_features = torch.squeeze(features)
-            sent_embeddings.append(word_features)
+            # word lengths for features
+            word_length = len(word)
+            word_lengths.append(word_length)
+
+            # check if word is in NLTK stop words list (1 for yes, 0 for no)
+            if word in stop_words:
+                stop_label = 1
+                stop_or_not.append(stop_label)
+            else: # not a stop word
+                stop_label = 0
+                stop_or_not.append(stop_label)
         
+        # word lengths tensor
+        length_features = torch.FloatTensor(word_lengths)
+
+        # stop words tensor
+        stop_features = torch.FloatTensor(stop_or_not)
+             
         # get pos tags
         pos_tagged = pos_tag(sent_words)
         pos_feats = []
@@ -90,13 +107,9 @@ def get_features(split_df, id2word, max_sample_length, pos_dict, embeds):
         
         # check if word is capitalised
         upper_feats = is_upper(sent_words)
-
-        # change dimension of word embeddings 
-        sent_stack = torch.stack(sent_embeddings)
         
         # put together all of the features
-        pos_upper_stack = torch.stack((pos_features, upper_feats), dim=1)
-        final_features = torch.cat((pos_upper_stack, sent_stack), dim=1)
+        final_features = torch.stack((pos_features, upper_feats, length_features, stop_features), dim=1)
 
         # pad
         num_words = final_features.shape[0]
@@ -134,27 +147,23 @@ def extract_features(data:pd.DataFrame, max_sample_length:int, id2word):
     # initialise POS tag dicts (keep consistent throughout split dataframes)
     pos_dict = {}
     
-    # initialise word embeddings
-    vocab_size = len(id2word.keys()) +1
-    embeds = nn.Embedding(vocab_size, 150)
-    
-    train = get_features(train_rows, id2word, max_sample_length, pos_dict, embeds)
+    train = get_features(train_rows, id2word, max_sample_length, pos_dict)
     print('train features')
     train_features = train[0]
     print('train shape', train_features.shape)
     train_dict = train[1] # to pass to next split to have the same POS tags
     
-    test = get_features(test_rows, id2word, max_sample_length, train_dict, embeds)
+    test = get_features(test_rows, id2word, max_sample_length, train_dict)
     print('test features')
     test_features = test[0]
     print('test shape', test_features.shape)
     test_dict = test[1]
     
-    dev = get_features(dev_rows, id2word, max_sample_length, test_dict, embeds)
+    dev = get_features(dev_rows, id2word, max_sample_length, test_dict)
     print('dev features')
     dev_features = dev[0]
     print('dev shape', dev_features.shape)
-    dev_dict = dev[1]
+    dev_dict = dev[1] 
     
     train_features = train_features.to(device)
     test_features = test_features.to(device)
